@@ -141,7 +141,7 @@ def main():
     val_train_loader_AT = torch.utils.data.DataLoader(
         val_train_datasets,
         num_workers=4,
-        batch_size=args.batch_size,
+        batch_size=args.batch_size_AT,
         shuffle=True)
 
     test_loader = torch.utils.data.DataLoader(
@@ -265,7 +265,7 @@ def main():
     state_dict = torch.load(os.path.join(save_dir, 'model_finetune.pt'))['state_dict']
     state_dict = cvt_state_dict(state_dict,args)
     model_save.load_state_dict(state_dict)
-    model_save.cuda()
+    model_save.eval().cuda()
     
     _, test_tacc = eval_test(model_save, device, test_loader, log, advFlag=None)
     test_atacc = eval_adv_test(model_save, device, test_loader, epsilon=8/255, alpha=2/255,
@@ -296,7 +296,8 @@ def train(train_loader, model, optimizer, scheduler, epoch, log):
                             x_natural=inputs,
                             y=targets.long().cuda(),
                             optimizer=optimizer,
-                            perturb_steps=10)
+                            perturb_steps=10,
+                            natural_mode='pgd')
         
         optimizer.zero_grad()
         loss.backward()
@@ -516,7 +517,8 @@ def train_AFF(args, model, device, train_loader, optimizer, epoch, log):
         loss = trades_loss_dual(model=model,
                                    x_natural=data,
                                    y=target,
-                                   optimizer=optimizer)
+                                   optimizer=optimizer,
+                                   natural_mode='normal')
 
         loss.backward()
         optimizer.step()

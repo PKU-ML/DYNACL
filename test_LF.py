@@ -287,7 +287,7 @@ def main():
 
 def runAA(model, loader, log_path):
     model.eval()
-    adversary = AutoAttack(model, norm='Linf', eps=8/255, version='custom', attacks_to_run=['apgd-ce', 'apgd-t'], log_path=log_path)
+    adversary = AutoAttack(model, norm='Linf', eps=8/255, version='standard', log_path=log_path)
     for images, labels in loader:
         images = images.cuda()
         labels = labels.cuda()

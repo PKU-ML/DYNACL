@@ -14,7 +14,7 @@ from torch.autograd import Variable
 from models.resnet_multi_bn import resnet18
 from models.resnet import resnet18 as resnet18_singleBN
 import time
-from utils import AverageMeter, logger
+from utils import AverageMeter, logger, trades_loss_dual
 import numpy as np
 import copy
 
@@ -144,13 +144,14 @@ def train(args, model, device, train_loader, optimizer, epoch, log):
 
         optimizer.zero_grad()
 
-        loss = trades_loss(model=model,
+        loss = trades_loss_dual(model=model,
                                    x_natural=data,
                                    y=target,
                                    optimizer=optimizer,
                                    step_size=args.step_size,
                                    epsilon=args.epsilon,
-                                   perturb_steps=args.num_steps_train,)
+                                   perturb_steps=args.num_steps_train,
+                                   natural_mode='normal')
 
         loss.backward()
         optimizer.step()
@@ -165,7 +166,7 @@ def train(args, model, device, train_loader, optimizer, epoch, log):
                      100. * batch_idx / len(train_loader), loss.item(), dataTimeAve.avg, totalTimeAve.avg))
 
 
-def eval_test(model, device, loader, log, advFlag = 'pgd'):
+def eval_test(model, device, loader, log, advFlag='pgd'):
     model.eval()
     test_loss = 0
     correct = 0
@@ -189,7 +190,7 @@ def eval_test(model, device, loader, log, advFlag = 'pgd'):
     test_accuracy = correct / whole
     return test_loss, test_accuracy * 100
 
-def eval_adv_test(model, device, test_loader, epsilon, alpha, criterion, log, attack_iter=20, advFlag = 'pgd'):
+def eval_adv_test(model, device, test_loader, epsilon, alpha, criterion, log, attack_iter=20, advFlag='pgd'):
     batch_time = AverageMeter()
     losses = AverageMeter()
     top1 = AverageMeter()
@@ -248,7 +249,7 @@ def main():
     scheduler = torch.optim.lr_scheduler.MultiStepLR(
         optimizer, milestones=decreasing_lr, gamma=0.1)
 
-    start_epoch = 1
+    start_epoch = 0
 
     if args.checkpoint != '':
         checkpoint = torch.load(args.checkpoint, map_location="cpu")
@@ -292,22 +293,22 @@ def main():
             'optim': optimizer.state_dict(),
         }, os.path.join(model_dir, 'model_finetune.pt'))
 
-    t_loader = torch.utils.data.DataLoader(
-        testset, batch_size=10000, shuffle=True, num_workers=0, pin_memory=True, drop_last=True)
-
-    _, test_tacc = eval_test(model, device, test_loader, log)
-    test_atacc = eval_adv_test(model, device, test_loader, epsilon=args.epsilon, alpha=args.step_size,
-                               criterion=F.cross_entropy, log=log, attack_iter=args.num_steps_test)
-    log.info("On the final model, test tacc is {}, test atacc is {}".format(
-        test_tacc, test_atacc))
-    log_path = 'checkpoints/' + args.experiment + '/robustness_result.txt'
-
     model_save = resnet18_singleBN(num_classes=num_classes) # original resnet (without multi BatchNorm)
     state_dict = torch.load(os.path.join(model_dir, 'model_finetune.pt'))['state_dict']
     state_dict = cvt_state_dict(state_dict,args)
     model_save.load_state_dict(state_dict)
-    model_save.cuda()
-    runAA(model_save, t_loader, log_path)
+    model_save.eval().cuda()
+
+    _, test_tacc = eval_test(model_save, device, test_loader, log, advFlag=None)
+    test_atacc = eval_adv_test(model_save, device, test_loader, epsilon=args.epsilon, alpha=args.step_size,
+                               criterion=F.cross_entropy, log=log, attack_iter=args.num_steps_test, advFlag=None)
+    log.info("On the final model, test tacc is {}, test atacc is {}".format(
+        test_tacc, test_atacc))
+    
+    aa_loader = torch.utils.data.DataLoader(
+        testset, batch_size=10000, shuffle=True, num_workers=4, pin_memory=True, drop_last=True)
+    log_path = 'checkpoints/' + args.experiment + '/robustness_result.txt'
+    runAA(model_save, aa_loader, log_path)
     torch.save({
         'state_dict': model_save.state_dict(),
     }, os.path.join(model_dir, 'model_full_finetune_singleBN.pt'))

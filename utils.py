@@ -400,7 +400,7 @@ def generate_high(Images, r):
     fd = fd.reshape([bs, c, h, w])
     return fd
 
-def trades_loss_dual(model, x_natural, y, optimizer, step_size=2/255, epsilon=8/255, perturb_steps=10, beta=6.0, distance='l_inf'):
+def trades_loss_dual(model, x_natural, y, optimizer, step_size=2/255, epsilon=8/255, perturb_steps=10, beta=6.0, distance='l_inf', natural_mode='pgd'):
     batch_size = len(x_natural)
     # define KL-loss
     criterion_kl = nn.KLDivLoss(size_average=False)
@@ -414,7 +414,7 @@ def trades_loss_dual(model, x_natural, y, optimizer, step_size=2/255, epsilon=8/
             with torch.enable_grad():
                 model.eval()
                 loss_kl = criterion_kl(F.log_softmax(model(x_adv,'pgd'), dim=1),
-                                       F.softmax(model(x_natural,'pgd'), dim=1))
+                                       F.softmax(model(x_natural,natural_mode), dim=1))
             grad = torch.autograd.grad(loss_kl, [x_adv])[0]
             x_adv = x_adv.detach() + step_size * torch.sign(grad.detach())
             x_adv = torch.min(torch.max(x_adv, x_natural -
@@ -429,7 +429,7 @@ def trades_loss_dual(model, x_natural, y, optimizer, step_size=2/255, epsilon=8/
     optimizer.zero_grad()
     model.train()
     # calculate robust loss
-    logits = model(x_natural, 'pgd')
+    logits = model(x_natural, natural_mode)
     loss = F.cross_entropy(logits, y)
     logits_adv = model(x_adv, 'pgd')
     loss_robust = (1.0 / batch_size) * criterion_kl(F.log_softmax(logits_adv, dim=1),
