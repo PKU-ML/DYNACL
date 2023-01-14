@@ -69,7 +69,7 @@ Pretrained after [DynACL](https://disk.pku.edu.cn:443/link/6753909DC4EC5E17AD4A5
 
 Finetuned after [DynACL++(single-BN)](https://disk.pku.edu.cn:443/link/575295C2C24F6F9404C50765D5899FD8)
 
-Finetuned after [DynACL++(dual-BN)](https://disk.pku.edu.cn:443/link/39CF382CC2ACF2B005277FCCB372F433)
+Finetuned after [DynACL++(dual-BN)](https://disk.pku.edu.cn:443/link/6543A73CECDF6F88EDD10FA7EB95508E)
 
 ## Citation
 ---
