@@ -25,14 +25,15 @@ from models.resnet import resnet18 as resnet18_single
 
 parser = argparse.ArgumentParser(description='DynACL++ (LPAFT-AFF)')
 parser.add_argument('--experiment', type=str,
-                    help='location for saving trained models')
-
+                    help='location for saving trained models,\
+                    we recommend to specify it as a subdirectory of the pretraining export path',
+                    required=True)
 parser.add_argument('--data', type=str, default='data/CIFAR10',
                     help='location of the data')
 parser.add_argument('--dataset', type=str, default='cifar10',
                     help='which dataset to be used, (cifar10 or cifar100)')
 parser.add_argument('--batch_size', type=int, default=512, help='batch size')
-parser.add_argument('--batch_size_AT', type=int, default=512, help='batch size')
+parser.add_argument('--batch_size_AT', type=int, default=128, help='batch size')
 
 parser.add_argument('--epochs', default=25, type=int,
                     help='number of total epochs to run')
@@ -76,7 +77,7 @@ def main():
 
     assert args.dataset in ['cifar100', 'cifar10']
 
-    save_dir = os.path.join('checkpoints', args.experiment)
+    save_dir = os.path.join('checkpoints_TEST', args.experiment)
     if os.path.exists(save_dir) is not True:
         os.system("mkdir -p {}".format(save_dir))
 
@@ -130,14 +131,14 @@ def main():
         num_workers=4,
         batch_size=args.batch_size,
         shuffle=True, drop_last=True)
-    
-    train_loader_AT = torch.utils.data.DataLoader(
-        train_datasets,
-        num_workers=4,
-        batch_size=args.batch_size_AT,
-        shuffle=True, drop_last=True)
 
     val_train_loader = torch.utils.data.DataLoader(
+        val_train_datasets,
+        num_workers=4,
+        batch_size=args.batch_size,
+        shuffle=True)
+    
+    val_train_loader_AT = torch.utils.data.DataLoader(
         val_train_datasets,
         num_workers=4,
         batch_size=args.batch_size,
@@ -196,8 +197,7 @@ def main():
             optimizer_head.state_dict()['param_groups'][0]['lr']))
         
         train_head(train_loader, model, optimizer_head, scheduler_head, epoch, log)
-         
-         
+
     # Pseudo finetuning
     log.info('Starts pseudo finetuning')
     for name, param in model.named_parameters():
@@ -208,7 +208,7 @@ def main():
         log.info("current lr is {}".format(
             optimizer.state_dict()['param_groups'][0]['lr']))
 
-        train(train_loader_AT, model, optimizer, scheduler, epoch, log)
+        train(train_loader, model, optimizer, scheduler, epoch, log)
 
         if(epoch % 5 == 0):
             save_checkpoint({
@@ -237,6 +237,10 @@ def main():
 
     # AFF evalution
     log.info('Starts AFF evaluation')
+    # zero init FC
+    model.fc.weight = torch.nn.Parameter(torch.zeros(model.fc.weight.shape))
+    model.fc.bias = torch.nn.Parameter(torch.zeros(model.fc.bias.shape))
+    model.fc.cuda()
     
     optimizer_AFF = torch.optim.SGD(model.parameters(), lr=0.1)
     scheduler_AFF = torch.optim.lr_scheduler.MultiStepLR(optimizer_AFF, milestones=[15,20], gamma=0.1)
@@ -247,15 +251,15 @@ def main():
             optimizer_AFF.state_dict()['param_groups'][0]['lr']))
 
         # linear classification
-        train_AFF(args, model, device, val_train_loader, optimizer_AFF, epoch, log)
+        train_AFF(args, model, device, val_train_loader_AT, optimizer_AFF, epoch, log)
         scheduler_AFF.step()
 
-    # save checkpoint
-    torch.save({
-        'epoch': epoch,
-        'state_dict': model.state_dict(),
-        'optim': optimizer.state_dict(),
-    }, os.path.join(save_dir, 'model_finetune.pt'))  
+        # save checkpoint
+        torch.save({
+            'epoch': epoch,
+            'state_dict': model.state_dict(),
+            'optim': optimizer.state_dict(),
+        }, os.path.join(save_dir, 'model_finetune.pt'))  
 
     model_save = resnet18_single(num_classes=num_classes) # original resnet (without multi BatchNorm)
     state_dict = torch.load(os.path.join(save_dir, 'model_finetune.pt'))['state_dict']
@@ -269,7 +273,7 @@ def main():
     log.info("On the final model (AFF evaluation), test tacc is {}, test atacc is {}".format(
         test_tacc, test_atacc))
     
-    log_path = 'checkpoints/' + args.experiment + '/robustness_result.txt'
+    log_path = 'checkpoints_TEST/' + args.experiment + '/robustness_result.txt'
     runAA(model_save, log_path)
     torch.save({
         'state_dict': model_save.state_dict(),
@@ -331,8 +335,6 @@ def train_head(train_loader, model, optimizer, scheduler, epoch, log):
         data_time_meter.update(data_time)
         inputs = inputs.cuda()
 
-        # inputs = pgd_attack(model, inputs, targets.long().cuda(
-        #             ), device, eps=8.0/255, alpha=2.0/255, iters=10, advFlag='pgd').data
         outputs = model.eval()(inputs, 'pgd')
         loss = criterion(outputs, targets.long().cuda())
 
@@ -502,7 +504,7 @@ def train_AFF(args, model, device, train_loader, optimizer, epoch, log):
     totalTimeAve = AverageMeter()
     end = time.time()
 
-    criterion = nn.CrossEntropyLoss().cuda()
+    # criterion = nn.CrossEntropyLoss().cuda()
 
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)

@@ -12,7 +12,7 @@ A standard pytorch environment with basic packages (e.g., numpy, pickle) is enou
     pip install git+https://github.com/fra31/auto-attack
 
 ## Data
-CIFAR10, CIFAR100, and STL10 dataset are required. You may manually download them and put them in the ``./data`` folder, or directly run our provided scripts to automatically download these datasets.
+CIFAR10, CIFAR100, and STL10 dataset are required. You may manually download them and put in the ``./data`` folder, or directly run our provided scripts to automatically download these datasets.
 
 ## Training
 
@@ -22,7 +22,7 @@ For DynACL, run
 
     python train_DynACL.py --experiment EXP_PATH --dataset DATASET_NAME --data PATH_TO_DATASET
 
-All training results (checkpoints and loggers) will be stored in ``./experiments/EXP_PATH``. Training takes around 30 hours on a single RTX 3090 GPU.
+All training results (checkpoints and loggers) will be stored in ``./experiments/EXP_PATH``. Training takes around  hours on a single RTX 3090 GPU.
 
 For DynACL++, we need to first generate pseudo labels:
 
@@ -65,11 +65,11 @@ We borrow the semi-supervised evaluation code from [ACL](https://github.com/VITA
 ## Pretrained weights
 ---
 
-Pretrained after [DynACL](https://github.com/Red-Fairy/ICLR23-DynACL)
+Pretrained after [DynACL](https://disk.pku.edu.cn:443/link/6753909DC4EC5E17AD4A5290A55EA6F0)
 
-Finetuned after [DynACL++(single-BN)](https://github.com/Red-Fairy/ICLR23-DynACL)
+Finetuned after [DynACL++(single-BN)](https://disk.pku.edu.cn:443/link/575295C2C24F6F9404C50765D5899FD8)
 
-Finetuned after [DynACL++(dual-BN)](https://github.com/Red-Fairy/ICLR23-DynACL)
+Finetuned after [DynACL++(dual-BN)](https://disk.pku.edu.cn:443/link/39CF382CC2ACF2B005277FCCB372F433)
 
 ## Citation
 ---

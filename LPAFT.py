@@ -30,7 +30,6 @@ parser.add_argument('--dataset', type=str, default='cifar10',
                     help='which dataset to be used, (cifar10 or cifar100 or stl10)')
 
 parser.add_argument('--batch_size', type=int, default=512, help='batch size')
-parser.add_argument('--batch_size_AT', type=int, default=512, help='batch size')
 
 parser.add_argument('--epochs_head', default=10, type=int,
                     help='number of epochs to train head')
@@ -141,12 +140,6 @@ def main():
         num_workers=4,
         batch_size=args.batch_size,
         shuffle=True, drop_last=True)
-    
-    train_loader_AT = torch.utils.data.DataLoader(
-        train_datasets,
-        num_workers=4,
-        batch_size=args.batch_size_AT,
-        shuffle=True, drop_last=True)
 
     val_train_loader = torch.utils.data.DataLoader(
         val_train_datasets,
@@ -184,7 +177,7 @@ def main():
     if 'state_dict' in state_dict:
         state_dict = state_dict['state_dict']
 
-    state_dict = cvt_state_dict(state_dict, args) # load the adversarial route
+    state_dict = cvt_state_dict(state_dict, args, num_classes) # load the adversarial route
     model.load_state_dict(state_dict, strict=True)
     log.info("checkpoint loaded from " + args.checkpoint)
     
@@ -220,7 +213,7 @@ def main():
         log.info("current lr is {}".format(
             optimizer.state_dict()['param_groups'][0]['lr']))
 
-        train(train_loader_AT, model, optimizer, scheduler, epoch, log)
+        train(train_loader, model, optimizer, scheduler, epoch, log)
 
         if(epoch % 5 == 0): # save checkpoint
             save_checkpoint({
@@ -464,7 +457,7 @@ def save_checkpoint(state, filename='weight.pt'):
     torch.save(state, filename)
 
 
-def cvt_state_dict(state_dict, args):
+def cvt_state_dict(state_dict, args, num_classes):
     # deal with adv bn
     state_dict_new = copy.deepcopy(state_dict)
 
@@ -503,7 +496,6 @@ def cvt_state_dict(state_dict, args):
         del state_dict_new[name]
 
     # zero init fc
-    num_classes = args.pseudo_label_num
     state_dict_new['fc.weight'] = torch.zeros(num_classes, 512).cuda()
     state_dict_new['fc.bias'] = torch.zeros(num_classes).cuda()
 
