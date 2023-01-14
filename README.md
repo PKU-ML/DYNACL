@@ -11,7 +11,7 @@ A standard pytorch environment (>=1.0.0) with basic packages (e.g., numpy, pickl
 
     pip install git+https://github.com/fra31/auto-attack
 
-Additionally, one package is required for generating pseudo labels. We recommend the [kmeans-pytorch](https://github.com/subhadarship/kmeans_pytorch) package (can be directly installed by pip). An alternative is the sklearn.
+Additionally, we need one package for generating pseudo labels. We recommend the [kmeans-pytorch](https://github.com/subhadarship/kmeans_pytorch) package (can be directly installed by pip), and sklearn is an alternative.
 
 ## Data
 CIFAR10, CIFAR100, and STL10 dataset are required. You may manually download them and put in the ``./data`` folder, or directly run our provided scripts to automatically download these datasets.
