@@ -22,7 +22,7 @@ For DynACL, run
 
     python train_DynACL.py --experiment EXP_PATH --dataset DATASET_NAME --data PATH_TO_DATASET
 
-All training results (checkpoints and loggers) will be stored in ``./experiments/EXP_PATH``. Training takes around  hours on a single RTX 3090 GPU.
+All training results (checkpoints and loggers) will be stored in ``./experiments/EXP_PATH``. Training takes around one day on a single RTX 3090 GPU.
 
 For DynACL++, we need to first generate pseudo labels:
 
