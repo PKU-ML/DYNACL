@@ -63,7 +63,6 @@ For DynACL++ evalution, the above training scripts (``LPAFT.py`` and ``LPAFT_AFF
 We borrow the semi-supervised evaluation code from [ACL](https://github.com/VITA-Group/Adversarial-Contrastive-Learning). You may clone their code and follow their semi-supervised evaluation steps. Note that you need to use ``LPAFT_AFF.py`` to train a model with dual BN.
 
 ## Pretrained weights
----
 
 Pretrained after [DynACL](https://disk.pku.edu.cn:443/link/6753909DC4EC5E17AD4A5290A55EA6F0)
 
@@ -72,7 +71,6 @@ Finetuned after [DynACL++(single-BN)](https://disk.pku.edu.cn:443/link/575295C2C
 Finetuned after [DynACL++(dual-BN)](https://disk.pku.edu.cn:443/link/6543A73CECDF6F88EDD10FA7EB95508E)
 
 ## Citation
----
 If you find our paper inspiring, please cite
 
     @inproceedings{DynACL,
