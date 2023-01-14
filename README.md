@@ -7,9 +7,11 @@ Authors: Rundong Luo*, Yifei Wang*, Yisen Wang from Peking University
 Recent works have shown that self-supervised learning can achieve remarkable robustness when integrated with adversarial training (AT). However, the robustness gap between supervised AT (sup-AT) and self-supervised AT (self-AT) remains significant. Motivated by this observation, we revisit existing self-AT methods and discover an inherent dilemma that affects self-AT robustness: either strong or weak data augmentations are harmful to self-AT, and a medium strength is insufficient to bridge the gap. To resolve this dilemma, we propose a simple remedy named DynACL (Dynamic Adversarial Contrastive Learning). In particular, we propose an augmentation schedule that gradually anneals from a strong augmentation to a weak one to benefit from both extreme cases. Besides, we adopt a fast post-processing stage for adapting it to downstream tasks. Through extensive experiments, we show that DynACL can improve the state-of-the-art self-AT robustness by 8.84% under Auto-Attack on the CIFAR-10 dataset, and can even outperform vanilla supervised adversarial training. We demonstrate that self-supervised AT can attain even better robustness than supervised AT for the first time.
 
 ## Environment
-A standard pytorch environment with basic packages (e.g., numpy, pickle) is enough. To evaluate under the Auto-Attack benchmark, the [autoattack](https://github.com/fra31/auto-attack) package is required. Run the following code to install:
+A standard pytorch environment with basic packages (e.g., numpy, pickle) is enough. Besides, to evaluate under the Auto-Attack benchmark, the [autoattack](https://github.com/fra31/auto-attack) package is required. Run the following code to install:
 
     pip install git+https://github.com/fra31/auto-attack
+
+Additionally, one package is required for generating pseudo labels. We recommend the [kmeans-pytorch](https://github.com/subhadarship/kmeans_pytorch) package (can be directly installed by pip). An alternative is the sklearn.
 
 ## Data
 CIFAR10, CIFAR100, and STL10 dataset are required. You may manually download them and put in the ``./data`` folder, or directly run our provided scripts to automatically download these datasets.

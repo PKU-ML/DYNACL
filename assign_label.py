@@ -9,7 +9,6 @@ import torchvision.transforms as transforms
 import copy
 import torch.nn as nn
 import argparse
-from sklearn.cluster import KMeans
 
 '''
 Assign and store the pseudo labels according to the
