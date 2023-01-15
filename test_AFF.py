@@ -31,9 +31,9 @@ parser.add_argument('--dataset', default='cifar10', type=str,
                     help='dataset to be used (cifar10 or cifar100)')
 
 parser.add_argument('--batch-size', type=int, default=128, metavar='N',
-                    help='input batch size for training (default: 128)')
+                    help='input batch size for training')
 parser.add_argument('--test-batch-size', type=int, default=128, metavar='N',
-                    help='input batch size for testing (default: 128)')
+                    help='input batch size for testing')
 
 parser.add_argument('--epochs', type=int, default=25, metavar='N',
                     help='number of epochs to train')
@@ -353,45 +353,6 @@ def cvt_state_dict(state_dict, args):
     state_dict_new['fc.weight'] = state_dict['fc.weight']
     state_dict_new['fc.bias'] = state_dict['fc.bias']
     return state_dict_new
-
-def trades_loss(model, x_natural, y, optimizer, step_size=0.003, epsilon=0.031, perturb_steps=10, beta=1.0, distance='l_inf'):
-    batch_size = len(x_natural)
-    # define KL-loss
-    criterion_kl = nn.KLDivLoss(size_average=False)
-    model.eval()
-    model.zero_grad()
-
-    # generate adversarial example
-    x_adv = x_natural.detach()
-    if distance == 'l_inf':
-        for _ in range(perturb_steps):
-            x_adv.requires_grad_()
-            with torch.enable_grad():
-                model.eval()
-                loss_kl = criterion_kl(F.log_softmax(model(x_adv,'pgd'), dim=1),
-                                       F.softmax(model(x_natural,'normal'), dim=1))
-            grad = torch.autograd.grad(loss_kl, [x_adv])[0]
-            x_adv = x_adv.detach() + step_size * torch.sign(grad.detach())
-            x_adv = torch.min(torch.max(x_adv, x_natural -
-                              epsilon), x_natural + epsilon)
-            x_adv = torch.clamp(x_adv, 0.0, 1.0)
-    else:
-        assert False
-
-    x_adv = Variable(torch.clamp(x_adv, 0.0, 1.0), requires_grad=False)
-
-    # zero gradient
-    optimizer.zero_grad()
-    model.train()
-    # calculate robust loss
-    logits = model(x_natural, 'normal')
-    loss = F.cross_entropy(logits, y)
-    logits_adv = model(x_adv, 'pgd')
-    loss_robust = (1.0 / batch_size) * criterion_kl(F.log_softmax(logits_adv, dim=1),
-                                                    F.softmax(logits, dim=1))
-    loss += beta * loss_robust
-
-    return loss
 
 def runAA(model, loader, log_path):
     model.eval()

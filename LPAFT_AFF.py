@@ -77,7 +77,7 @@ def main():
 
     assert args.dataset in ['cifar100', 'cifar10']
 
-    save_dir = os.path.join('checkpoints_TEST', args.experiment)
+    save_dir = os.path.join('checkpoints', args.experiment)
     if os.path.exists(save_dir) is not True:
         os.system("mkdir -p {}".format(save_dir))
 
@@ -242,7 +242,7 @@ def main():
     model.fc.bias = torch.nn.Parameter(torch.zeros(model.fc.bias.shape))
     model.fc.cuda()
     
-    optimizer_AFF = torch.optim.SGD(model.parameters(), lr=0.1)
+    optimizer_AFF = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=2e-4)
     scheduler_AFF = torch.optim.lr_scheduler.MultiStepLR(optimizer_AFF, milestones=[15,20], gamma=0.1)
     
     for epoch in range(1, args.epochs + 1):
@@ -273,7 +273,7 @@ def main():
     log.info("On the final model (AFF evaluation), test tacc is {}, test atacc is {}".format(
         test_tacc, test_atacc))
     
-    log_path = 'checkpoints_TEST/' + args.experiment + '/robustness_result.txt'
+    log_path = 'checkpoints/' + args.experiment + '/robustness_result.txt'
     runAA(model_save, log_path)
     torch.save({
         'state_dict': model_save.state_dict(),
@@ -493,7 +493,7 @@ def runAA(model, log_path):
             root=args.data, train=False, transform=tfs_test, download=True)
     test_loader = torch.utils.data.DataLoader(
         test_datasets, batch_size=10000, pin_memory=True, num_workers=4)
-    adversary = AutoAttack(model, norm='Linf', eps=8/255, version='custom', attacks_to_run=['apgd-ce', 'apgd-t'], log_path=log_path)
+    adversary = AutoAttack(model, norm='Linf', eps=8/255, version='standard', log_path=log_path)
     for images, labels in test_loader:
         images = images.cuda()
         labels = labels.cuda()
@@ -575,6 +575,3 @@ def cvt_state_dict(state_dict, args):
 
 if __name__ == '__main__':
     main()
-
-    
-
