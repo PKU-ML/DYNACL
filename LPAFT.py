@@ -361,6 +361,8 @@ def validate(val_loader, test_loader, model, log, num_classes=10, autoattack=Fal
     
     if args.dataset == 'cifar10':
         lr = 0.01
+    elif args.dataset == 'cifar100':
+        lr = 0.05
     else:
         lr = 0.1
 
