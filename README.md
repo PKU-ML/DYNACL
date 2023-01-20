@@ -1,6 +1,7 @@
 # [ICLR23] Rethinking the Effect of Data Augmentation in Adversarial Contrastive Learning
 
 Authors: Rundong Luo*, Yifei Wang*, Yisen Wang from Peking University
+
 *: Equal contribution
 
 [Paper](https://openreview.net/forum?id=0qmwFNJyxCL&noteId=ZXhFXELOcQ)
