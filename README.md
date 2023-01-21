@@ -54,18 +54,18 @@ All training results (checkpoints and loggers) will be stored in ``./experiments
 
 ## Evaluation
 
-### DynACL (SLF & ALF) 
+### SLF & ALF
 
     python test_LF.py --experiment EXP_PATH --checkpoint PATH_TO_PRETRAINED_MODEL --dataset DATASET_NAME --data PATH_TO_DATASET --cvt_state_dict --bnNameCnt 1 --evaluation_mode EVALUATION_MODE
 
-### DynACL (AFF) 
+### AFF
 
     python test_AFF.py --experiment EXP_PATH --checkpoint PATH_TO_PRETRAINED_MODEL --dataset DATASET_NAME --data PATH_TO_DATASET
 
-### DynACL++ (SLF & ALF & AFF)
-For DynACL++ evalution, the above training scripts (``LPAFT.py`` and ``LPAFT_AFF.py``) already contain the evaluation part. You may also use ``test_LF.py`` and ``test_AFF.py`` for evaluation. Be aware that ``LPAFT.py`` will give you a single-BN checkpoint, so there's no need to specify ``cvt_state_dict``.
+<!-- ### DynACL++ (SLF & ALF & AFF) -->
+Note that for DynACL++ evalution, the above training scripts (``LPAFT.py`` and ``LPAFT_AFF.py``) already contain the evaluation part. You may also use ``test_LF.py`` and ``test_AFF.py`` for evaluation. Be aware that ``LPAFT.py`` will give you a single-BN checkpoint, so there's no need to specify ``cvt_state_dict``.
 
-### DynACL++ (semi-supervised)
+### Semi-supervised
 We borrow the semi-supervised evaluation code from [ACL](https://github.com/VITA-Group/Adversarial-Contrastive-Learning). You may clone their code and follow their semi-supervised evaluation steps. Note that you need to use ``LPAFT_AFF.py`` to train a model with dual BN.
 
 ## Pretrained weights
