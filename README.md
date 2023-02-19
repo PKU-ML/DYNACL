@@ -72,11 +72,11 @@ We borrow the semi-supervised evaluation code from [ACL](https://github.com/VITA
 
 We provide the pretrained weights for DynACL and DynACL++ on CIFAR10.
 
-Pretrained after DynACL [CIFAR10](https://disk.pku.edu.cn:443/link/6753909DC4EC5E17AD4A5290A55EA6F0), [CIFAR100](https://disk.pku.edu.cn:443/link/E1C0DAE88837EB6CBEC3DEECC2BB4598), [STL10](https://disk.pku.edu.cn:443/link/620CED6E06B1EE7DD8DE0670B422D1CA).
+Pretrained after DynACL [CIFAR10](https://drive.google.com/file/d/1Z1TBKMzRLHyGT9ZavtBQsqnU8k9zRAxj/view?usp=share_link), [CIFAR100](https://drive.google.com/file/d/1vB1UpniQpp0atVsTzhCchuL25Pf72ZwI/view?usp=share_link), [STL10](https://drive.google.com/file/d/1WOmxSQLB2VQbLRDLMOmTnoeTgeZssHzI/view?usp=share_link).
 
-Finetuned after DynACL++ (single-BN) [CIFAR10](https://disk.pku.edu.cn:443/link/575295C2C24F6F9404C50765D5899FD8), [CIFAR100](https://disk.pku.edu.cn:443/link/7165560AD0870F232C48416583BAB09B), [STL10](https://disk.pku.edu.cn:443/link/CDF6BEC76443B7B9E285A5EE27E879CC).
+Finetuned after DynACL++ (single-BN) [CIFAR10](https://drive.google.com/file/d/1oSUW11EGEi963tLLENywImtIO787JgTr/view?usp=share_link), [CIFAR100](https://drive.google.com/file/d/1gNMxTsQU706yYXtC37yEMCWtXSJy4lhO/view?usp=share_link), [STL10](https://drive.google.com/file/d/1j8_ZjJh3PxSi-HhK0FSU34wlaZrmOFBW/view?usp=share_link).
 
-Finetuned after DynACL++ (dual-BN for AFF evaluation) [CIFAR10](https://disk.pku.edu.cn:443/link/6543A73CECDF6F88EDD10FA7EB95508E).
+Finetuned after DynACL++ (dual-BN for AFF evaluation) [CIFAR10](https://drive.google.com/file/d/1qDU-vgip84APK2LJDJH6kCNLnw4hPEzu/view?usp=share_link).
 
 ## Citation
 If you find our paper inspiring, please cite
